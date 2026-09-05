@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AgenticMart — Agentic Commerce Dashboard</title>
+    <meta name="description" content="AI-powered agent-to-agent commerce platform with mandate-gated payments, live audit trails, and autonomous buyer agents.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body>
+
+    <!-- Header -->
+    <header class="header" id="header">
+        <div class="header-left">
+            <div class="logo">
+                <span class="logo-icon">🛒</span>
+                <span class="logo-text">AgenticMart</span>
+                <span class="logo-badge">AI Commerce</span>
+            </div>
+        </div>
+        <div class="header-metrics" id="headerMetrics">
+            <div class="metric" id="metricSpend">
+                <span class="metric-label">Session Spend</span>
+                <div class="metric-bar">
+                    <div class="metric-bar-fill" id="spendBarFill" style="width: 0%"></div>
+                </div>
+                <span class="metric-value" id="spendValue">₹0 / ₹2,000</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Cart Items</span>
+                <span class="metric-value metric-big" id="cartCount">0</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Upsell Rate</span>
+                <span class="metric-value metric-big" id="upsellRate">0%</span>
+            </div>
+            <div class="metric">
+                <span class="metric-label">Orders</span>
+                <span class="metric-value metric-big" id="orderCount">0</span>
+            </div>
+        </div>
+        <div class="header-right">
+            <button class="btn btn-ghost" id="btnReset" title="Reset Session">↺ Reset</button>
+        </div>
+    </header>
+
+    <!-- Main Layout -->
+    <main class="main-layout">
+
+        <!-- Left Panel: Chat -->
+        <section class="panel chat-panel" id="chatPanel">
+            <div class="panel-header">
+                <h2>💬 Shopping Assistant</h2>
+                <span class="panel-badge" id="chatBadge">Human</span>
+            </div>
+            <div class="chat-messages" id="chatMessages">
+                <div class="chat-welcome">
+                    <div class="welcome-icon">🤖</div>
+                    <h3>Welcome to AgenticMart!</h3>
+                    <p>I'm your AI shopping assistant. Search for products, build your cart, and checkout — all through conversation.</p>
+                    <div class="welcome-suggestions">
+                        <button class="suggestion-chip" onclick="sendMessage('Show me all snacks')">🍫 Browse snacks</button>
+                        <button class="suggestion-chip" onclick="sendMessage('I need groceries for the week')">🛒 Weekly groceries</button>
+                        <button class="suggestion-chip" onclick="sendMessage('What electronics do you have?')">🔌 Electronics</button>
+                        <button class="suggestion-chip" onclick="sendMessage('Show me your best deals')">💰 Best deals</button>
+                    </div>
+                </div>
+            </div>
+            <div class="chat-input-area">
+                <div class="chat-input-wrapper">
+                    <input type="text" id="chatInput" placeholder="Type or speak your message..." autocomplete="off">
+                    <button class="btn btn-ghost" id="btnVoice" title="Start voice input">
+                        <span class="btn-icon">🎤</span>
+                    </button>
+                    <button class="btn btn-primary" id="btnSend" onclick="sendMessage()">
+                        <span class="btn-icon">→</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Right Panel: Mandates + Audit -->
+        <section class="panel right-panel">
+
+            <!-- Mandate Chain Visualization -->
+            <div class="mandate-section" id="mandateSection">
+                <div class="panel-header">
+                    <h2>🔗 Mandate Chain</h2>
+                    <span class="panel-badge badge-protocol">AP2 Protocol</span>
+                </div>
+                <div class="mandate-chain" id="mandateChain">
+                    <div class="mandate-card mandate-intent" id="mandateIntent">
+                        <div class="mandate-icon">📋</div>
+                        <div class="mandate-type">Intent</div>
+                        <div class="mandate-status" id="intentStatus">Waiting</div>
+                        <div class="mandate-detail" id="intentDetail">Buyer's request will appear here</div>
+                    </div>
+                    <div class="mandate-arrow" id="arrow1">
+                        <div class="arrow-line"></div>
+                        <div class="arrow-head">▶</div>
+                    </div>
+                    <div class="mandate-card mandate-cart" id="mandateCart">
+                        <div class="mandate-icon">🛒</div>
+                        <div class="mandate-type">Cart</div>
+                        <div class="mandate-status" id="cartStatus">Waiting</div>
+                        <div class="mandate-detail" id="cartDetail">Proposed items will appear here</div>
+                    </div>
+                    <div class="mandate-arrow" id="arrow2">
+                        <div class="arrow-line"></div>
+                        <div class="arrow-head">▶</div>
+                    </div>
+                    <div class="mandate-card mandate-payment" id="mandatePayment">
+                        <div class="mandate-icon">💳</div>
+                        <div class="mandate-type">Payment</div>
+                        <div class="mandate-status" id="paymentStatus">Waiting</div>
+                        <div class="mandate-detail" id="paymentDetail">Approval status will appear here</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- AI Buyer Demo -->
+            <div class="ai-buyer-section" id="aiBuyerSection">
+                <div class="panel-header">
+                    <h2>🤖 AI Buyer Agent</h2>
+                    <span class="panel-badge badge-ai" id="aiBuyerBadge">Idle</span>
+                </div>
+                <div class="ai-buyer-controls" id="aiBuyerControls">
+                    <div class="persona-selector">
+                        <button class="persona-btn active" data-persona="grocery_shopper" onclick="selectPersona(this)">
+                            <span class="persona-emoji">🥬</span>
+                            <span class="persona-name">GroceryBot</span>
+                            <span class="persona-budget">₹1,500</span>
+                        </button>
+                        <button class="persona-btn" data-persona="snack_lover" onclick="selectPersona(this)">
+                            <span class="persona-emoji">🍫</span>
+                            <span class="persona-name">SnackHunter</span>
+                            <span class="persona-budget">₹800</span>
+                        </button>
+                        <button class="persona-btn" data-persona="budget_buster" onclick="selectPersona(this)">
+                            <span class="persona-emoji">💸</span>
+                            <span class="persona-name">BigSpender</span>
+                            <span class="persona-budget">₹3,000</span>
+                        </button>
+                    </div>
+                    <button class="btn btn-ai" id="btnLaunchAI" onclick="launchAIBuyer()">
+                        🚀 Launch AI Buyer Demo
+                    </button>
+                </div>
+                <div class="ai-conversation" id="aiConversation" style="display: none;">
+                    <!-- AI buyer messages appear here -->
+                </div>
+            </div>
+
+            <!-- Live Audit Trail -->
+            <div class="audit-section" id="auditSection">
+                <div class="panel-header">
+                    <h2>📋 Live Audit Trail</h2>
+                    <span class="audit-count" id="auditCount">0 events</span>
+                </div>
+                <div class="audit-log" id="auditLog">
+                    <div class="audit-empty">Audit events will stream here in real-time...</div>
+                </div>
+            </div>
+
+        </section>
+    </main>
+
+    <!-- Loading overlay -->
+    <div class="loading-overlay" id="loadingOverlay" style="display: none;">
+        <div class="loading-spinner"></div>
+        <div class="loading-text">Processing...</div>
+    </div>
+
+    <script src="/static/js/app.js"></script>
+</body>
+</html>
